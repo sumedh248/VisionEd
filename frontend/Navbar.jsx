@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import "./Navbar.css";
 
-function Sidebar() {
+function Sidebar({ setOpen: parentSetOpen }) {
   const [open, setOpen] = useState(true);
+  
+  // Notify parent about sidebar state
+  React.useEffect(() => {
+    if (parentSetOpen) parentSetOpen(open);
+  }, [open, parentSetOpen]);
 
   return (
     <div className={open ? "sidebar open" : "sidebar collapsed"}>
