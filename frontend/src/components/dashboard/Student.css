@@ -1,0 +1,79 @@
+.student {
+  padding: 20px;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+/* Title */
+.title {
+  color: #28a745;
+  margin-bottom: 20px;
+}
+
+/* Cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.icon {
+  font-size: 20px;
+  color: #28a745;
+  margin-bottom: 5px;
+}
+
+/* Sections */
+.sections {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.section {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+}
+
+.section h4 {
+  margin-bottom: 10px;
+}
+
+.section li {
+  margin-bottom: 6px;
+}
+
+/* Chart */
+.chart-section {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+}
+
+.chart-placeholder {
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: gray;
+  border: 2px dashed #ddd;
+  margin-top: 10px;
+}
