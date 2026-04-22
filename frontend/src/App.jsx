@@ -10,6 +10,8 @@ import TestResult from "../src/components/test/TestResult"
 import CareerGuidance from "../src/components/career/CareerGuidance"
 import Student from "../src/components/dashboard/Student"
 
+import QuizPage from "./components/career/QuizPage";  
+
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
@@ -25,7 +27,9 @@ function App() {
               <Route path='/admin'element={<Admin />}/>
               <Route path='/student'element={<Student />}/>
               <Route path='/testresult'element={<TestResult />}/>
-              <Route path='/careerguidence'element={<CareerGuidance />}/> 
+              <Route path='/careerguidence'element={<CareerGuidance />}/>
+              <Route path='/career'element={<CareerGuidance />}/>
+              <Route path="/quiz" element={<QuizPage />} /> 
           </Routes>
         </BrowserRouter>
        

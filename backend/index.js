@@ -1,13 +1,140 @@
 import express from "express";
 import UserModel from "./models/UserModel.js";
 import mongoose from "mongoose";
-import dotenv from "dotenv";  
-dotenv.config();
+import cors from "cors";
+import axios from "axios";
+import dotenv from "dotenv";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: join(__dirname, ".env") });
 
 const app=express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors());
 app.use(express.json());
 
 const MONGO_URL = process.env.MONGO_URL;
+
+const careerProfiles = {
+    analytical: {
+        career: "Data Analyst",
+        skills: ["Statistics", "Excel or SQL", "Data visualization"],
+        colleges: ["IIT Bombay", "NIT Trichy", "Delhi University"],
+        roadmap: ["Build math fundamentals", "Learn SQL and Python", "Create data projects"]
+    },
+    creativity: {
+        career: "UI/UX Designer",
+        skills: ["Design thinking", "Figma", "Visual communication"],
+        colleges: ["NID Ahmedabad", "MIT Institute of Design", "Pearl Academy"],
+        roadmap: ["Learn design basics", "Practice wireframes", "Build a portfolio"]
+    },
+    social: {
+        career: "Psychologist",
+        skills: ["Communication", "Empathy", "Research"],
+        colleges: ["TISS Mumbai", "Christ University", "Delhi University"],
+        roadmap: ["Study psychology", "Do internships", "Pursue higher specialization"]
+    },
+    tech: {
+        career: "Software Engineer",
+        skills: ["Programming", "Problem solving", "System design"],
+        colleges: ["IIT Bombay", "NIT Trichy", "VIT Vellore"],
+        roadmap: ["Learn coding basics", "Build projects", "Prepare for internships"]
+    }
+};
+
+app.post("/career-predict", (req, res) => {
+    const scores = req.body;
+    const categories = ["analytical", "creativity", "social", "tech"];
+
+    const topCategory = categories.reduce((best, category) => {
+        return Number(scores[category] || 0) > Number(scores[best] || 0)
+            ? category
+            : best;
+    }, categories[0]);
+
+    res.json({
+        category: topCategory,
+        scores,
+        ...careerProfiles[topCategory]
+    });
+});
+
+app.get("/generate-roadmap", (req, res) => {
+    res.json({
+        message: "Roadmap API is running. Send a POST request with { career, strengths } to generate a roadmap.",
+        openrouterConfigured: Boolean(process.env.OPENROUTER_API_KEY)
+    });
+});
+
+app.post("/generate-roadmap", async (req, res) => {
+    try {
+        const { career, strengths } = req.body;
+
+        if (!career) {
+            return res.status(400).json({ error: "Career is required" });
+        }
+
+        if (!process.env.OPENROUTER_API_KEY) {
+            return res.status(500).json({ error: "OPENROUTER_API_KEY is not configured" });
+        }
+
+        const response = await axios.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {
+                model: "openai/gpt-4o-mini",
+                messages: [
+                    {
+                        role: "system",
+                        content: "You are a career guidance expert."
+                    },
+                    {
+                        role: "user",
+                        content: `
+Generate a structured career roadmap for "${career}".
+
+Student strengths:
+${JSON.stringify(strengths || {}, null, 2)}
+
+STRICT RULES:
+- Output ONLY valid JSON
+- No extra text
+- 5 to 7 steps
+- Each step must include: title, description
+- Personalize the roadmap based on strengths when provided
+
+Format:
+{
+  "career": "",
+  "steps": [
+    { "title": "", "description": "" }
+  ]
+}
+`
+                    }
+                ]
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                    "HTTP-Referer": "http://localhost:3000",
+                    "X-Title": "VisionEd AI Career Guide"
+                }
+            }
+        );
+
+        let text = response.data.choices[0].message.content;
+        text = text.replace(/```json|```/g, "").trim();
+
+        const json = JSON.parse(text);
+        res.json(json);
+    } catch (error) {
+        console.error(error.response?.data || error.message);
+        res.status(500).json({ error: "Roadmap generation failed" });
+    }
+});
 
 app.get("/allUsers",async (req,res)=>{
     let tempUsers = [
@@ -107,13 +234,18 @@ res.send("Data inserted");
 
 })
 
-mongoose.connect(MONGO_URL)
-.then(() => {
-    console.log("MongoDB Atlas Connected");
-    app.listen(3002, () => {
-        console.log("Server running on port 3002");
+if (MONGO_URL) {
+    mongoose.connect(MONGO_URL)
+    .then(() => {
+        console.log("MongoDB Atlas Connected");
+    })
+    .catch((err) => {
+        console.log("Connection Failed", err.message);
     });
-})
-.catch((err) => {
-    console.log("Connection Failed", err.message);
-})
+} else {
+    console.log("MONGO_URL not found. Starting server without database connection.");
+}
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
