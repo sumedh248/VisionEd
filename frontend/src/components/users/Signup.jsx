@@ -6,14 +6,14 @@ export default function Signup() {
     <div className="d-flex justify-content-center align-items-center min-vh-100">
       <div
         className="row border rounded shadow bg-white"
-        style={{ width: "800px", height : "500px", backgroundColor: "#28a745" }}
+        style={{ width: "800px", height : "450px", backgroundColor: "#28a745" }}
       >
         <div className="col-6 p-0 rounded overflow-hidden">
           <img src={Signupimg} alt="" className="w-100 h-100 object-fit-cover" />
         </div>
 
         <div
-          style={{ backgroundColor: "#28a745" }}
+          style={{ backgroundColor: "#ffffff" }}
           className="col-6 d-flex flex-column justify-content-center align-items-center p-4 rounded"
         >
           <h2 className="mb-4 fw-bold">Signup</h2>
@@ -28,7 +28,7 @@ export default function Signup() {
             </div>
             <input
               type="text"
-              className="form-control rounded-pill border-0 bg-secondary bg-opacity-25"
+              className="form-control border-0 bg-secondary bg-opacity-25"
               placeholder="Username"
             />
           </div>
@@ -42,7 +42,7 @@ export default function Signup() {
             </div>
             <input
               type="text"
-              className="form-control rounded-pill border-0 bg-secondary bg-opacity-25"
+              className="form-control border-0 bg-secondary bg-opacity-25"
               placeholder="Email Address"
             />
           </div>
@@ -57,7 +57,7 @@ export default function Signup() {
             </div>
             <input
               type="text"
-              className="form-control rounded-pill border-0 bg-secondary bg-opacity-25"
+              className="form-control  border-0 bg-secondary bg-opacity-25"
               placeholder="Phone Number"
             />
           </div>
@@ -73,7 +73,7 @@ export default function Signup() {
             <input
               type="text"
               className="form-control rounded-pill border-0 bg-secondary bg-opacity-25"
-              placeholder="Password"
+              placeholder="Phone Number"
             />
           </div>
 
@@ -89,12 +89,12 @@ export default function Signup() {
             <input
               type="text"
               className="form-control rounded-pill border-0 bg-secondary bg-opacity-25"
-              placeholder="Confirm Password"
+              placeholder="Phone Number"
             />
           </div>
 
 
-          <button className="btn btn-dark w-100 rounded-pill fw-bold">
+          <button className="btn btn-dark w-90 rounded-pill fw-bold">
             Signup
           </button>
         </div>

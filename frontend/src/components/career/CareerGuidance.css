@@ -1,0 +1,77 @@
+.career {
+  padding: 20px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+/* HERO */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.hero-text {
+  flex: 1;
+}
+
+.hero-text h2 {
+  color: #28a745;
+  margin-bottom: 10px;
+}
+
+.hero-text p {
+  color: gray;
+  margin-bottom: 15px;
+}
+
+.hero-img {
+  flex: 1;
+  text-align: right;
+}
+
+.hero-img img {
+  width: 80%;
+  border-radius: 10px;
+}
+
+/* GRID (2 per row) */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+/* Cards */
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 18px; /* 🔥 more curve */
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.card:hover {
+  transform: translateY(-4px);
+  transition: 0.3s;
+}
+
+.card h4 {
+  margin-bottom: 10px;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
