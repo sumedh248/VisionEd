@@ -1,7 +1,7 @@
 import React from "react";
 import Homeimg from "../../assets/home.jpeg";
 import "./hero.css";
-
+import { Link } from "react-router-dom";
 export default function Hero() {
   return (
     <div>
@@ -22,12 +22,13 @@ export default function Hero() {
             Personalized Career Guidance for Every Student, Powered by AI.
             <br /> Let's Start with test and know where you get fitt!!
           </p>
-          <button
+         <Link                                   
+            to="/Signup"
             className="btn text-white card-hover"
             style={{ backgroundColor: "green" }}
           >
-            Get Strated Now→
-          </button>
+            Get Started Now →                     
+          </Link>
         </div>
       </div>
 
