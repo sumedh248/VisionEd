@@ -6,7 +6,7 @@ export default function Signup() {
     <div className="d-flex justify-content-center align-items-center min-vh-100">
       <div
         className="row border rounded shadow bg-white"
-        style={{ width: "800px", height : "450px", backgroundColor: "#28a745" }}
+        style={{ width: "800px", height : "500px", backgroundColor: "#28a745" }}
       >
         <div className="col-6 p-0 rounded overflow-hidden">
           <img src={Signupimg} alt="" className="w-100 h-100 object-fit-cover" />
@@ -73,7 +73,7 @@ export default function Signup() {
             <input
               type="text"
               className="form-control rounded-pill border-0 bg-secondary bg-opacity-25"
-              placeholder="Phone Number"
+              placeholder="Password"
             />
           </div>
 
@@ -89,7 +89,7 @@ export default function Signup() {
             <input
               type="text"
               className="form-control rounded-pill border-0 bg-secondary bg-opacity-25"
-              placeholder="Phone Number"
+              placeholder="Confirm Password"
             />
           </div>
 

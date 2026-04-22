@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./Navbar.css";
 
 function Sidebar({ setOpen: parentSetOpen }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   
   // Notify parent about sidebar state
   React.useEffect(() => {

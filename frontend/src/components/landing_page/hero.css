@@ -1,0 +1,45 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes swipeRight {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-in-out;
+}
+
+.swipe-right {
+  animation: swipeRight 0.8s ease-out;
+}
+
+.swipe-right:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.swipe-right:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.card-hover {
+  transition: transform 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: scale(1.05);
+}
