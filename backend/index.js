@@ -261,24 +261,24 @@ app.post("/signup", async (req, res) => {
       standard,
       marks,
       hobbies,
-      password,
+      password
     } = req.body;
 
-    // ✅ validation
+    // validation
     if (!username || !email || !phone || !password) {
       return res.status(400).json({ message: "Required fields missing" });
     }
 
-    // ✅ check existing user
+    // check existing user
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // ✅ hash password
+    // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // ✅ create user (ADD NEW FIELDS HERE)
+    // create user with ALL fields
     const newUser = new UserModel({
       name: username,
       email,
@@ -296,7 +296,6 @@ app.post("/signup", async (req, res) => {
       user: {
         name: newUser.name,
         email: newUser.email,
-        standard: newUser.standard,
       },
     });
 
