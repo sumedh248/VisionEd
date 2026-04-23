@@ -1,8 +1,9 @@
 import React from "react";
 import Homeimg from "../../assets/home.jpeg";
 import "./hero.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 export default function Hero() {
+  const navigate = useNavigate();
   return (
     <div>
       <div
@@ -29,6 +30,9 @@ export default function Hero() {
           >
             Get Started Now →                     
           </Link>
+          <button onClick={() => navigate("/quiz")}>
+  Start Career Quiz
+</button>
         </div>
       </div>
 
@@ -66,7 +70,7 @@ export default function Hero() {
             <div className="col-md-4 text-center swipe-right card-hover">
               <div className="mb-3">
                 <i
-                  class="fa-solid fa-laptop-code fs-1 "
+                  className="fa-solid fa-laptop-code fs-1 "
                   style={{ color: "green" }}
                 ></i>
               </div>

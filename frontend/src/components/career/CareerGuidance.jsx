@@ -1,8 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import "./CareerGuidance.css";
 import hero from "../../assets/signup.jpeg"; // you can change image
+import RoadmapFlow from "./RoadmapFlow";
 
 function CareerGuidance() {
+  const location = useLocation();
+  const result = location.state?.result || [];
+  const scores = location.state?.scores || {};
+  const topCareer = result[0];
+  const [roadmap, setRoadmap] = useState(null);
+  const [loadingRoadmap, setLoadingRoadmap] = useState(false);
+  const [roadmapError, setRoadmapError] = useState("");
+
+  console.log(result);
+
+  const getRoadmap = async (career) => {
+    setLoadingRoadmap(true);
+    setRoadmapError("");
+
+    try {
+      const res = await fetch("http://localhost:3000/generate-roadmap", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          career,
+          strengths: scores
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Roadmap generation failed");
+      }
+
+      setRoadmap(data);
+    } catch (error) {
+      setRoadmapError(error.message);
+    } finally {
+      setLoadingRoadmap(false);
+    }
+  };
+
   return (
     <div className="career">
 
@@ -31,7 +73,23 @@ function CareerGuidance() {
 
         <div className="card">
           <h4><i className="fas fa-bullseye me-2"></i>Recommended Career</h4>
-          <p style={{backgroundColor:'lightgreen', borderRadius:"80px"}}>Software Engineer</p>
+          {topCareer ? (
+            <div className="career-results">
+              <p className="top-career">
+                {topCareer.career}
+                <span>{topCareer.match}% match</span>
+              </p>
+
+              {result.slice(1).map((career) => (
+                <div className="career-match" key={career.career}>
+                  <span>{career.career}</span>
+                  <strong>{career.match}%</strong>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="empty-result">Complete the quiz to see your career matches.</p>
+          )}
         </div>
 
         <div className="card">
@@ -53,11 +111,25 @@ function CareerGuidance() {
 
         <div className="card">
           <h4><i className="fas fa-road me-2"></i>Career Roadmap</h4>
-          <ol>
-            <li>12th Science</li>
-            <li>Entrance Exams</li>
-            <li>Engineering</li>
-          </ol>
+          {topCareer ? (
+            <>
+              <button
+                className="btn btn-success roadmap-btn"
+                onClick={() => getRoadmap(topCareer.career)}
+                disabled={loadingRoadmap}
+              >
+                {loadingRoadmap ? "Generating roadmap..." : "Generate Roadmap"}
+              </button>
+
+              {roadmapError && <p className="roadmap-error">{roadmapError}</p>}
+
+              {roadmap?.steps?.length > 0 && (
+                <RoadmapFlow steps={roadmap.steps} />
+              )}
+            </>
+          ) : (
+            <p className="empty-result">Complete the quiz to generate a roadmap.</p>
+          )}
         </div>
 
       </div>

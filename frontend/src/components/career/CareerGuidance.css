@@ -63,6 +63,83 @@
   margin-bottom: 10px;
 }
 
+.career-results {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.top-career {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background-color: lightgreen;
+  border-radius: 80px;
+  font-weight: 700;
+  margin: 0;
+  padding: 10px 16px;
+}
+
+.top-career span {
+  color: #14532d;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.career-match {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px 2px;
+}
+
+.career-match strong {
+  color: #28a745;
+}
+
+.empty-result {
+  color: gray;
+  margin: 0;
+}
+
+.roadmap-btn {
+  margin-bottom: 12px;
+}
+
+.roadmap-error {
+  color: crimson;
+  margin: 0 0 12px;
+}
+
+.roadmap-flow {
+  height: 500px;
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.roadmap-node {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 220px;
+  white-space: normal;
+  text-align: left;
+}
+
+.roadmap-node strong {
+  color: #14532d;
+}
+
+.roadmap-node span {
+  color: #374151;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 /* Actions */
 .actions {
   display: flex;
