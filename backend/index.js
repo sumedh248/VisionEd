@@ -4,14 +4,17 @@ import mongoose from "mongoose";
 import cors from "cors";
 import axios from "axios";
 import dotenv from "dotenv";
+import bcrypt from "bcryptjs";
+
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: join(__dirname, ".env") });
 
 const app=express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
@@ -231,8 +234,94 @@ app.get("/allUsers",async (req,res)=>{
 ];
 await UserModel.insertMany(tempUsers);
 res.send("Data inserted");
+});
 
-})
+app.post("/signup", async (req, res) => {
+  console.log("API HIT");
+  console.log("BODY:", req.body);
+
+  try {
+    const {
+      username,
+      email,
+      phone,
+      standard,
+      marks,
+      hobbies,
+      password,
+    } = req.body;
+
+    // ✅ validation
+    if (!username || !email || !phone || !password) {
+      return res.status(400).json({ message: "Required fields missing" });
+    }
+
+    // ✅ check existing user
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    // ✅ hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // ✅ create user (ADD NEW FIELDS HERE)
+    const newUser = new UserModel({
+      name: username,
+      email,
+      phone,
+      standard,
+      marks,
+      hobbies,
+      password: hashedPassword,
+    });
+
+    await newUser.save();
+
+    res.status(201).json({
+      message: "Signup successful",
+      user: {
+        name: newUser.name,
+        email: newUser.email,
+        standard: newUser.standard,
+      },
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // find user
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // compare password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid password" });
+    }
+
+    res.json({
+      message: "Login successful",
+      user: {
+        name: user.name,
+        email: user.email,
+      },
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 if (MONGO_URL) {
     mongoose.connect(MONGO_URL)

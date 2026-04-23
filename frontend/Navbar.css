@@ -1,110 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=DM+Sans:wght@400;500&display=swap');
+
+:root {
+  --navy: #1a3328;
+  --navy-mid: #1e3d2f;
+  --navy-surface: #224736;
+  --teal: #1a9e6a;
+  --teal-light: rgba(26, 158, 106, 0.13);
+  --teal-border: rgba(26, 158, 106, 0.3);
+  --sidebar-bg: #e8f5ee;
+  --sidebar-width-open: 220px;
+  --sidebar-width-collapsed: 64px;
+  --item-hover: rgba(26, 51, 40, 0.06);
+  --item-active: rgba(26, 158, 106, 0.12);
+  --text-primary: #1a3328;
+  --text-muted: rgba(40, 80, 58, 0.65);
+  --divider: rgba(26, 80, 55, 0.1);
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Sidebar shell ─────────────────────────────── */
 .sidebar {
-  height: 100vh;
+  font-family: 'DM Sans', sans-serif;
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #ffffff;
-  border-right: 1px solid #adadad;
-  transition: all 0.3s ease;
-  overflow: hidden;
+  height: 100vh;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   z-index: 100;
+  transition: width var(--transition);
+  overflow: hidden;
+  border-right: 1px solid var(--divider);
+
+  /* subtle inner texture */
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgba(26, 158, 106, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse at 100% 100%, rgba(180, 230, 200, 0.3) 0%, transparent 50%);
 }
 
-/* Open vs Collapsed */
 .sidebar.open {
-  width: 220px;
+  width: var(--sidebar-width-open);
 }
 
 .sidebar.collapsed {
-  width: 70px;
+  width: var(--sidebar-width-collapsed);
 }
 
-/* Toggle Button */
-.toggle-btn {
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-/* Logo */
+/* ── Logo / toggle ─────────────────────────────── */
 .logo {
-  text-align: center;
-  margin: 15px 0 30px;
-  font-weight: bold;
-  font-size: 20px;
-  color: #28a745;
-  cursor: pointer; /* makes it clickable */
-  transition: 0.2s;
+  font-family: 'Sora', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  user-select: none;
+  padding: 20px 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  border-bottom: 1px solid var(--divider);
+  transition: background var(--transition), color var(--transition);
+  white-space: nowrap;
 }
 
 .logo:hover {
-  opacity: 0.8;
+  background: var(--item-hover);
 }
 
 .logo span {
-  color: black;
+  color: var(--teal);
 }
 
-/* Links */
-.sidebar a {
+/* collapsed icon — the "VE" pill */
+.sidebar.collapsed .logo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--teal);
+  background: var(--teal-light);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  margin: 14px auto;
+  padding: 0;
+  min-height: unset;
+  border: 1px solid var(--teal-border);
+  letter-spacing: 0.04em;
+}
+
+/* ── Nav menu ──────────────────────────────────── */
+.menu {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 8px;
+  overflow: hidden;
+}
+
+.menu a {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  color: #333;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
   text-decoration: none;
-  gap: 10px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background var(--transition), color var(--transition), gap var(--transition);
+  white-space: nowrap;
+  position: relative;
 }
 
-.sidebar a:hover {
-  background-color: #f0fdf4;
-  color: #28a745;
+.menu a:hover {
+  background: var(--item-hover);
+  color: var(--text-primary);
 }
 
-/* Icons center when collapsed */
-.sidebar.collapsed a {
+.menu a.active,
+.menu a:focus-visible {
+  background: var(--item-active);
+  color: var(--teal);
+}
+
+/* teal left-bar indicator on active */
+.menu a.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 2.5px;
+  border-radius: 0 2px 2px 0;
+  background: var(--teal);
+}
+
+.menu a i {
+  font-size: 16px;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+  transition: color var(--transition);
+}
+
+.menu a:hover i,
+.menu a.active i {
+  color: var(--teal);
+}
+
+/* collapsed: center icons */
+.sidebar.collapsed .menu a {
   justify-content: center;
+  padding: 10px 0;
+  gap: 0;
 }
 
-/* Hide text when collapsed */
-.sidebar.collapsed a span {
-  display: none;
+/* ── Divider ───────────────────────────────────── */
+.sidebar-divider {
+  height: 1px;
+  background: var(--divider);
+  margin: 4px 16px;
 }
 
+/* ── Profile section ───────────────────────────── */
 .profile {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  gap: 12px;
-  margin-top: auto;
-  color: #333;
-  cursor: pointer;
+  gap: 10px;
+  padding: 14px 12px;
+  border-top: 1px solid var(--divider);
+  background: rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.profile:hover {
-  background-color: #f0fdf4; /* same as menu hover */
-  color: #28a745;
-}
-
-.profile i {
-  font-size: 20px;
-}
-
-/* Text styling same as menu */
-.profile-info p {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.profile-info small {
-  color: gray;
-}
-
-/* Collapse behavior */
 .sidebar.collapsed .profile {
   justify-content: center;
+  padding: 14px 0;
 }
 
-.sidebar.collapsed .profile-info {
-  display: none;
+/* avatar circle */
+.profile-avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--teal-light);
+  border: 1.5px solid var(--teal-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.profile-avatar i {
+  font-size: 15px;
+  color: var(--teal);
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.profile-info p {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-action {
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: none;
+  margin-top: 2px;
+  letter-spacing: 0.02em;
+  transition: opacity var(--transition);
+}
+
+.profile-action:hover {
+  opacity: 0.8;
+}
+
+.profile-action.logout {
+  color: #c0392b;
+}
+
+.profile-action.login {
+  color: var(--teal);
 }

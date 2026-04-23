@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import './App.css'
 import Navbar from '../Navbar'
 import HomePage from "../src/components/landing_page/HomePage"
@@ -19,22 +19,19 @@ function App() {
     <div className="app-container">
       <Navbar setOpen={setSidebarOpen} />
       <main className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-        <BrowserRouter>
+        
           <Routes>
               <Route path='/'element={<HomePage />}/>
               <Route path='/signup'element={<Signup />}/>
               <Route path='/login'element={<Login />}/>
               <Route path='/admin'element={<Admin />}/>
               <Route path='/student'element={<Student />}/>
-              <Route path='/testresult'element={<TestResult />}/>
+              <Route path='/test'element={<TestResult />}/>
               <Route path='/careerguidence'element={<CareerGuidance />}/>
               <Route path='/career'element={<CareerGuidance />}/>
               <Route path="/quiz" element={<QuizPage />} /> 
           </Routes>
-        </BrowserRouter>
        
-
-
       </main>
     </div>
   )
