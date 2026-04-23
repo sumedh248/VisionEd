@@ -23,16 +23,14 @@ export default function Hero() {
             Personalized Career Guidance for Every Student, Powered by AI.
             <br /> Let's Start with test and know where you get fitt!!
           </p>
-         <Link                                   
+          <Link
             to="/Signup"
             className="btn text-white card-hover"
             style={{ backgroundColor: "green" }}
           >
-            Get Started Now →                     
+            Get Started Now →
           </Link>
-          <button onClick={() => navigate("/quiz")}>
-  Start Career Quiz
-</button>
+          <button onClick={() => navigate("/quiz")}>Start Career Quiz</button>
         </div>
       </div>
 
