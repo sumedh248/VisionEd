@@ -4,8 +4,8 @@ export const UserSchema = new Schema({
     name: String,
     email: String,
     phone: String,
+    standard: String,
+    marks: Number,
+    hobbies: String,
     password: String,
-    standard:String,
-    marks:String,
-    hobbies:String,
 })
