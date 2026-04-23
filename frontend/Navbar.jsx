@@ -10,7 +10,7 @@ function Sidebar({ setOpen: parentSetOpen }) {
   }, [open, parentSetOpen]);
 
   return (
-    <div className={open ? "sidebar open" : "sidebar collapsed"}>
+    <div className={open ? "sidebar open" : "sidebar collapsed"} style={{ backgroundColor: "#E8EDF2"}}>
 
       {/* Logo Toggle */}
       <h4 className="logo" onClick={() => setOpen(!open)}>

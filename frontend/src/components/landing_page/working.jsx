@@ -35,7 +35,7 @@ export default function Working() {
   }, []);
 
   return (
-    <div className="m-3 border">
+    <div className="m-3  " style={{ backgroundColor: "#E8EDF2"}}>
       <h2 className="text-center text-black mt-5 mb-5">How we work</h2>
       <div
         ref={(el) => (itemRefs.current.working1 = el)}

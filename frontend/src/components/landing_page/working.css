@@ -33,3 +33,22 @@
 .card-zoom:hover {
   transform: scale(1.02);
 }
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .bounce-arrow {
+    font-size: 1.5rem !important;
+    margin: 1rem 0;
+  }
+
+  .m-3 {
+    margin: 1rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .bounce-arrow {
+    font-size: 1.25rem !important;
+    margin: 0.75rem 0;
+  }
+}
