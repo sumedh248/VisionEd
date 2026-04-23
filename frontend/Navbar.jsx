@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 const NAV_ITEMS = [
   { to: "/",          icon: "fas fa-home",       label: "Home"      },
   { to: "/dashboard", icon: "fas fa-chart-line",  label: "Dashboard" },
-  { to: "/test",      icon: "fas fa-brain",       label: "Tests"     },
+  { to: "/career",      icon: "fas fa-brain",       label: "Tests"     },
 ];
 
 function getInitials(name = "") {

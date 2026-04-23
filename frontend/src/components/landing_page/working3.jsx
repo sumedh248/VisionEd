@@ -1,5 +1,8 @@
 import React from "react";
 import Collegeimg from "../../assets/college.jpeg";
+import { Link, useNavigate } from "react-router-dom";
+
+
 export default function Working3() {
   return (
     <div>
@@ -50,7 +53,12 @@ export default function Working3() {
               </div>
             </div>
 
-            <a className="btn btn-success align-self-start">Show now</a>
+            <Link
+            to="/career"
+            className="btn btn-success align-self-start"
+          >
+            show now
+          </Link>
           </div>
         </div>
       </div>

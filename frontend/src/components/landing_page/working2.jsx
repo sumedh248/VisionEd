@@ -1,5 +1,6 @@
 import React from "react";
 import Suggestimg from "../../assets/suggestions.jpeg";
+import { Link, useNavigate } from "react-router-dom";
 export default function Working2() {
   return (
     <div>
@@ -49,7 +50,12 @@ export default function Working2() {
               </div>
             </div>
 
-            <a className="btn btn-success align-self-start">Show now</a>
+            <Link
+            to="/career "
+            className="btn btn-success align-self-start"
+          >
+            Show now
+          </Link>
           </div>
         </div>
       </div>

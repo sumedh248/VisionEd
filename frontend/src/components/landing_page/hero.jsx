@@ -24,13 +24,12 @@ export default function Hero() {
             <br /> Let's Start with test and know where you get fitt!!
           </p>
           <Link
-            to="/Signup"
+            to="/quiz"
             className="btn text-white card-hover"
             style={{ backgroundColor: "green" }}
           >
             Get Started Now →
           </Link>
-          <button onClick={() => navigate("/quiz")}>Start Career Quiz</button>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import React from "react";
 import testimg from "../../assets/test.jpeg";
+import { Link, useNavigate } from "react-router-dom";
 export default function Working1() {
   return (
     <div>
@@ -47,7 +48,12 @@ export default function Working1() {
               </div>
             </div>
 
-            <a className="btn btn-success align-self-start">Start Quiz</a>
+            <Link
+            to="/quiz"
+            className="btn btn-success align-self-start"
+          >
+            Start Quiz
+          </Link>
           </div>
         </div>
       </div>
