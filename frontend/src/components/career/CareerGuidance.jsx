@@ -1,152 +1,80 @@
-import React, { useState } from "react";
+import React from "react";
 import { useLocation } from "react-router-dom";
 import "./CareerGuidance.css";
-import hero from "../../assets/signup.jpeg"; // you can change image
-import RoadmapFlow from "./RoadmapFlow";
 
-function CareerGuidance() {
+const CareerGuidance = () => {
   const location = useLocation();
-  const result = location.state?.result || [];
-  const scores = location.state?.scores || {};
-  const topCareer = result[0];
-  const [roadmap, setRoadmap] = useState(null);
-  const [loadingRoadmap, setLoadingRoadmap] = useState(false);
-  const [roadmapError, setRoadmapError] = useState("");
+  const { result, scores } = location.state || {};
 
-  console.log(result);
-
-  const getRoadmap = async (career) => {
-    setLoadingRoadmap(true);
-    setRoadmapError("");
-
-    try {
-      const res = await fetch("http://localhost:3000/generate-roadmap", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          career,
-          strengths: scores
-        })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Roadmap generation failed");
-      }
-
-      setRoadmap(data);
-    } catch (error) {
-      setRoadmapError(error.message);
-    } finally {
-      setLoadingRoadmap(false);
-    }
-  };
+  if (!result) {
+    return (
+      <div className="cg-page">
+        <h2>No result found. Please take the test.</h2>
+      </div>
+    );
+  }
 
   return (
-    <div className="career">
+    <div className="cg-page">
 
-      {/* Hero Section */}
-      <div className="hero">
-        <div className="hero-text">
-          <h2>Career Guidance by VisionEd</h2>
-          <p>
-            Get personalized career recommendations, skills roadmap,
-            and top college suggestions based on your performance.
-          </p>
-
-          <button className="btn btn-success">
-            <i className="fas fa-compass me-2"></i>
-            Explore Careers
-          </button>
-        </div>
-
-        <div className="hero-img">
-          <img src={hero} alt="career" />
-        </div>
+      {/* Header */}
+      <div className="cg-header">
+        <span className="cg-tag">AI Career Result</span>
+        <h1>Your Career Recommendation</h1>
+        <p>Based on your responses, here’s the best path for you.</p>
       </div>
 
-      {/* 2 Column Layout */}
-      <div className="grid">
+      {/* Career Card */}
+      <div className="cg-card highlight">
+        <h2>{result.career}</h2>
+        <p className="cg-category">{result.category}</p>
+      </div>
 
-        <div className="card">
-          <h4><i className="fas fa-bullseye me-2"></i>Recommended Career</h4>
-          {topCareer ? (
-            <div className="career-results">
-              <p className="top-career">
-                {topCareer.career}
-                <span>{topCareer.match}% match</span>
-              </p>
-
-              {result.slice(1).map((career) => (
-                <div className="career-match" key={career.career}>
-                  <span>{career.career}</span>
-                  <strong>{career.match}%</strong>
-                </div>
-              ))}
+      {/* Scores */}
+      <div className="cg-card">
+        <h3>📊 Your Scores</h3>
+        <div className="cg-scores">
+          {Object.entries(scores).map(([key, val]) => (
+            <div key={key} className="cg-score-item">
+              <span>{key}</span>
+              <strong>{val.toFixed(2)}</strong>
             </div>
-          ) : (
-            <p className="empty-result">Complete the quiz to see your career matches.</p>
-          )}
+          ))}
         </div>
-
-        <div className="card">
-          <h4><i className="fas fa-lightbulb me-2"></i>Skills Required</h4>
-          <ul>
-            <li>Programming</li>
-            <li>Problem Solving</li>
-            <li>Communication</li>
-          </ul>
-        </div>
-
-        <div className="card">
-          <h4><i className="fas fa-university me-2"></i>Top Colleges</h4>
-          <ul>
-            <li>IIT Bombay</li>
-            <li>NIT Trichy</li>
-          </ul>
-        </div>
-
-        <div className="card">
-          <h4><i className="fas fa-road me-2"></i>Career Roadmap</h4>
-          {topCareer ? (
-            <>
-              <button
-                className="btn btn-success roadmap-btn"
-                onClick={() => getRoadmap(topCareer.career)}
-                disabled={loadingRoadmap}
-              >
-                {loadingRoadmap ? "Generating roadmap..." : "Generate Roadmap"}
-              </button>
-
-              {roadmapError && <p className="roadmap-error">{roadmapError}</p>}
-
-              {roadmap?.steps?.length > 0 && (
-                <RoadmapFlow steps={roadmap.steps} />
-              )}
-            </>
-          ) : (
-            <p className="empty-result">Complete the quiz to generate a roadmap.</p>
-          )}
-        </div>
-
       </div>
 
-      {/* Actions */}
-      <div className="actions">
-        <button className="btn btn-outline-success">
-          <i className="fas fa-book me-2"></i>Courses
-        </button>
+      {/* Skills */}
+      <div className="cg-card">
+        <h3>🧠 Skills Required</h3>
+        <ul>
+          {result.skills.map((skill, i) => (
+            <li key={i}>{skill}</li>
+          ))}
+        </ul>
+      </div>
 
-        <button className="btn btn-success">
-          <i className="fas fa-user-tie me-2"></i>Mentor
-        </button>
+      {/* Colleges */}
+      <div className="cg-card">
+        <h3>🏫 Recommended Colleges</h3>
+        <ul>
+          {result.colleges.map((college, i) => (
+            <li key={i}>{college}</li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Roadmap */}
+      <div className="cg-card">
+        <h3>🚀 Roadmap</h3>
+        <ol>
+          {result.roadmap.map((step, i) => (
+            <li key={i}>{step}</li>
+          ))}
+        </ol>
       </div>
 
     </div>
   );
-}
+};
 
 export default CareerGuidance;
