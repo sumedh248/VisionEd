@@ -1,5 +1,15 @@
 import express from "express";
 import UserModel from "./models/UserModel.js";
+const path = require("path");
+const methodOverride = require("method-override");
+const ExpressError = require("./utils/ExpressError.js");
+const session = require("express-session");
+const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+
+import AdminModel from "./models/AdminModel.js";
+import TestResultModel from "./models/TestResultModel.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import axios from "axios";
@@ -18,6 +28,8 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+app.use(methodOverride("_method"));
+
 
 const MONGO_URL = process.env.MONGO_URL;
 
@@ -96,26 +108,26 @@ app.post("/generate-roadmap", async (req, res) => {
                     {
                         role: "user",
                         content: `
-Generate a structured career roadmap for "${career}".
+                                Generate a structured career roadmap for "${career}".
 
-Student strengths:
-${JSON.stringify(strengths || {}, null, 2)}
+                                Student strengths:
+                                ${JSON.stringify(strengths || {}, null, 2)}
 
-STRICT RULES:
-- Output ONLY valid JSON
-- No extra text
-- 5 to 7 steps
-- Each step must include: title, description
-- Personalize the roadmap based on strengths when provided
+                                STRICT RULES:
+                                - Output ONLY valid JSON
+                                - No extra text
+                                - 5 to 7 steps
+                                - Each step must include: title, description
+                                - Personalize the roadmap based on strengths when provided
 
-Format:
-{
-  "career": "",
-  "steps": [
-    { "title": "", "description": "" }
-  ]
-}
-`
+                                Format:
+                                {
+                                "career": "",
+                                "steps": [
+                                    { "title": "", "description": "" }
+                                ]
+                                }
+                                `
                     }
                 ]
             },
@@ -138,6 +150,7 @@ Format:
         res.status(500).json({ error: "Roadmap generation failed" });
     }
 });
+
 
 
 app.post("/signup", async (req, res) => {
@@ -228,15 +241,54 @@ app.post("/login", async (req, res) => {
 
 if (MONGO_URL) {
     mongoose.connect(MONGO_URL)
-    .then(() => {
-        console.log("MongoDB Atlas Connected");
-    })
-    .catch((err) => {
-        console.log("Connection Failed", err.message);
-    });
+        .then(() => {
+            console.log("MongoDB Atlas Connected");
+        })
+        .catch((err) => {
+            console.log("Connection Failed", err.message);
+        });
 } else {
     console.log("MONGO_URL not found. Starting server without database connection.");
 }
+
+
+const sessionoptions = {
+    store,
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true
+    }
+}
+
+app.use(session(sessionoptions));
+app.use(flash());
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(UserModel.authenticate()));
+
+passport.serializeUser(UserModel.serializeUser());
+passport.deserializeUser(UserModel.deserializeUser());
+
+app.use((req, res, next)=> {
+   res.locals.success = req.flash("success");
+   res.locals.error = req.flash("error");
+   res.locals.curruser = req.user;
+   next();
+});
+
+app.use((req, res, next) => {
+   next(new ExpressError(404, "Page Not Found"));
+});
+
+app.use((err, req, res, next) => {
+   const { statuscode = 500, message = "something went wrng" } = err;
+//    res.render("errors.ejs", {message});
+});
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
