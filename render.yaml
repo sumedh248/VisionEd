@@ -28,7 +28,7 @@ services:
     plan: free
     rootDir: ml-model
     buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 app:app
     envVars:
       - key: ALLOWED_ORIGINS
         value: https://visioned-frontend.onrender.com,https://visionedd-frontend.onrender.com,http://localhost:5173,http://127.0.0.1:5173

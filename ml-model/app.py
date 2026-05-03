@@ -1,10 +1,28 @@
 import os
-import requests
-from flask import Flask, request, jsonify
-import pandas as pd
 import pickle
 
+import pandas as pd
+import requests
+from flask import Flask, jsonify, request
+
 app = Flask(__name__)
+
+SUPABASE_URL = "https://dmbcwefbuhdmparaaivr.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmN3ZWZidWhkbXBhcmFhaXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzIxNDAsImV4cCI6MjA5MjcwODE0MH0.JLGI5PwsKHM-ZUi6xor6IsFVXHuj1zHOFqZoZVpan68"
+FEATURES = [
+    "programming",
+    "algorithms",
+    "os_networks",
+    "dbms",
+    "oop",
+    "computer_architecture",
+    "software_engineering",
+    "cyber_security",
+    "machine_learning",
+    "cloud_computing",
+    "compiler_design",
+    "computer_graphics",
+]
 
 
 def get_allowed_origins():
@@ -22,6 +40,28 @@ def get_allowed_origins():
     return configured | defaults
 
 
+def load_career_id_map():
+    try:
+        response = requests.get(
+            f"{SUPABASE_URL}/rest/v1/careers?select=id,name",
+            headers={
+                "apikey": SUPABASE_KEY,
+                "Authorization": f"Bearer {SUPABASE_KEY}",
+            },
+            timeout=5,
+        )
+        response.raise_for_status()
+        careers = response.json() or []
+        return {
+            str(career.get("name", "")).strip(): career.get("id")
+            for career in careers
+            if career.get("name")
+        }
+    except requests.RequestException as error:
+        print(f"Failed to preload career map: {error}")
+        return {}
+
+
 @app.after_request
 def add_cors_headers(response):
     origin = request.headers.get("Origin")
@@ -31,13 +71,22 @@ def add_cors_headers(response):
         response.headers["Vary"] = "Origin"
 
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     return response
 
-# Load model
+
 model = pickle.load(open("model.pkl", "rb"))
 encoder = pickle.load(open("encoder.pkl", "rb"))
-FEATURES = ["analytical", "creativity", "social", "tech"]
+CAREER_ID_BY_NAME = load_career_id_map()
+
+
+@app.get("/health")
+def health():
+    return jsonify({
+        "status": "ok",
+        "careerCount": len(CAREER_ID_BY_NAME),
+    })
+
 
 @app.route("/predict", methods=["POST", "OPTIONS"])
 def predict():
@@ -45,7 +94,6 @@ def predict():
         return "", 204
 
     data = request.get_json() or {}
-
     missing_features = [feature for feature in FEATURES if feature not in data]
 
     if missing_features:
@@ -61,49 +109,25 @@ def predict():
                 "error": f"{feature} score must be a number between 1 and 5"
             }), 400
 
-    features = pd.DataFrame(
-        [
-            {
-                "analytical": data["analytical"],
-                "creativity": data["creativity"],
-                "social": data["social"],
-                "tech": data["tech"],
-            }
-        ]
-    )
+    features = pd.DataFrame([
+        {feature: data[feature] for feature in FEATURES}
+    ])
 
     probs = model.predict_proba(features)[0]
-
     top_indices = probs.argsort()[-3:][::-1]
 
-    SUPABASE_URL = "https://dmbcwefbuhdmparaaivr.supabase.co"
-    SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtYmN3ZWZidWhkbXBhcmFhaXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzIxNDAsImV4cCI6MjA5MjcwODE0MH0.JLGI5PwsKHM-ZUi6xor6IsFVXHuj1zHOFqZoZVpan68"
-
     results = []
-    for i in top_indices:
-        career_name = encoder.inverse_transform([i])[0]
-
-        # Fetch career_id from Supabase
-        response = requests.get(
-            f"{SUPABASE_URL}/rest/v1/careers?name=eq.{career_name}",
-            headers={
-                "apikey": SUPABASE_KEY,
-                "Authorization": f"Bearer {SUPABASE_KEY}"
-            }
-        )
-
-        career_data = response.json()
-        career_id = career_data[0]["id"] if career_data else None
-
+    for index in top_indices:
+        career_name = encoder.inverse_transform([index])[0]
         results.append({
             "career": career_name,
-            "career_id": career_id,
-            "match": round(probs[i] * 100, 2)
+            "career_id": CAREER_ID_BY_NAME.get(career_name),
+            "match": round(probs[index] * 100, 2),
         })
 
     return jsonify(results)
 
+
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5001"))
-    app.run(host="0.0.0.0", port=port, debug=True)
-
+    app.run(host="0.0.0.0", port=port, debug=False)

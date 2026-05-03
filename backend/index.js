@@ -302,9 +302,9 @@ Format:
   }
 };
 
-const fetchMlPredictions = async (scores) => {
+const fetchMlPredictions = async (rawScores) => {
   try {
-    const response = await axios.post(ML_MODEL_URL, scores, { timeout: 8000 });
+    const response = await axios.post(ML_MODEL_URL, rawScores, { timeout: 30000 });
     const payload = response?.data;
     const predictions = Array.isArray(payload) ? payload : Array.isArray(payload?.results) ? payload.results : [];
 
@@ -321,8 +321,8 @@ const fetchMlPredictions = async (scores) => {
   }
 };
 
-const buildCareerResult = async (scores) => {
-  const mlPredictions = await fetchMlPredictions(scores);
+const buildCareerResult = async (scores, rawScores = scores) => {
+  const mlPredictions = await fetchMlPredictions(rawScores);
   const mlTopCareer = mlPredictions[0]?.career || "";
   const categoryFromMl = mlTopCareer ? ML_CAREER_CATEGORIES[mlTopCareer] || "" : "";
   const category = mlTopCareer ? categoryFromMl || getTopCategory(scores) : "";
@@ -416,13 +416,14 @@ const toClientTestResult = (row) => ({
 
 app.post("/career-predict", async (req, res) => {
   try {
-    const scores = normalizeScores(req.body || {});
+    const rawScores = req.body || {};
+    const scores = normalizeScores(rawScores);
 
     if (!areScoresValid(scores)) {
       return res.status(400).json({ message: "Scores must be numbers between 1 and 5" });
     }
 
-    const result = await buildCareerResult(scores);
+    const result = await buildCareerResult(scores, rawScores);
     res.json(result);
   } catch (error) {
     console.error(error);
@@ -673,7 +674,7 @@ app.post("/submit-test", requireAuth, async (req, res) => {
       return res.status(400).json({ message: "Scores must be numbers between 1 and 5" });
     }
 
-    const result = await buildCareerResult(scores);
+    const result = await buildCareerResult(scores, scorePayload || {});
     const selectedScore = Number.isFinite(scores[result.category]) ? scores[result.category] : null;
 
     let savedAssessment = null;
@@ -704,19 +705,23 @@ app.post("/submit-test", requireAuth, async (req, res) => {
     savedAssessment = assessment;
 
     if (assessment && result.mlPredictions && result.mlPredictions.length > 0) {
-      const predictionsToInsert = result.mlPredictions.map(p => ({
-        assessment_id: assessment.id,
-        career_id: p.career_id,
-        confidence_score: p.match
-      }));
+      const predictionsToInsert = result.mlPredictions
+        .filter((prediction) => prediction.career_id)
+        .map((prediction) => ({
+          assessment_id: assessment.id,
+          career_id: prediction.career_id,
+          confidence_score: prediction.match
+        }));
 
-      const { error: predictionsError } = await req.supabase
-        .from("career_predictions")
-        .insert(predictionsToInsert);
+      if (predictionsToInsert.length > 0) {
+        const { error: predictionsError } = await req.supabase
+          .from("career_predictions")
+          .insert(predictionsToInsert);
         
-      if (predictionsError) {
-        console.error("Error inserting career_predictions:", predictionsError);
-        throw predictionsError;
+        if (predictionsError) {
+          console.error("Error inserting career_predictions:", predictionsError);
+          throw predictionsError;
+        }
       }
     }
 
@@ -753,19 +758,23 @@ app.post("/save-test-result", requireAuth, async (req, res) => {
     savedAssessment = assessment;
 
     if (assessment && mlPredictions && mlPredictions.length > 0) {
-      const predictionsToInsert = mlPredictions.map(p => ({
-        assessment_id: assessment.id,
-        career_id: p.career_id,
-        confidence_score: p.match
-      }));
+      const predictionsToInsert = mlPredictions
+        .filter((prediction) => prediction.career_id)
+        .map((prediction) => ({
+          assessment_id: assessment.id,
+          career_id: prediction.career_id,
+          confidence_score: prediction.match
+        }));
 
-      const { error: predictionsError } = await req.supabase
-        .from("career_predictions")
-        .insert(predictionsToInsert);
+      if (predictionsToInsert.length > 0) {
+        const { error: predictionsError } = await req.supabase
+          .from("career_predictions")
+          .insert(predictionsToInsert);
 
-      if (predictionsError) {
-        console.error("Error inserting career_predictions:", predictionsError);
-        throw predictionsError;
+        if (predictionsError) {
+          console.error("Error inserting career_predictions:", predictionsError);
+          throw predictionsError;
+        }
       }
     }
 
