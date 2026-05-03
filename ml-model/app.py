@@ -1,3 +1,5 @@
+import os
+import requests
 from flask import Flask, request, jsonify
 import pandas as pd
 import pickle
@@ -60,14 +62,34 @@ def predict():
 
     top_indices = probs.argsort()[-3:][::-1]
 
+    SUPABASE_URL = "https://dmbcwefbuhdmparaaivr.supabase.co"
+    SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtYmN3ZWZidWhkbXBhcmFhaXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzIxNDAsImV4cCI6MjA5MjcwODE0MH0.JLGI5PwsKHM-ZUi6xor6IsFVXHuj1zHOFqZoZVpan68"
+
     results = []
     for i in top_indices:
+        career_name = encoder.inverse_transform([i])[0]
+
+        # Fetch career_id from Supabase
+        response = requests.get(
+            f"{SUPABASE_URL}/rest/v1/careers?name=eq.{career_name}",
+            headers={
+                "apikey": SUPABASE_KEY,
+                "Authorization": f"Bearer {SUPABASE_KEY}"
+            }
+        )
+
+        career_data = response.json()
+        career_id = career_data[0]["id"] if career_data else None
+
         results.append({
-            "career": encoder.inverse_transform([i])[0],
+            "career": career_name,
+            "career_id": career_id,
             "match": round(probs[i] * 100, 2)
         })
 
     return jsonify(results)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.getenv("PORT", "5001"))
+    app.run(host="0.0.0.0", port=port, debug=True)
+

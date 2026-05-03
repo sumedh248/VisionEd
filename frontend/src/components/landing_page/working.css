@@ -1,54 +1,376 @@
-@keyframes bounce {
-  0%, 100% {
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap');
+
+.working-page {
+  --working-navy: #0f1f3d;
+  --working-teal: #0e9f8a;
+  --working-surface: #f7f8fc;
+  --working-card: rgba(255, 255, 255, 0.96);
+  --working-border: rgba(15, 31, 61, 0.1);
+  --working-muted: #5a6a85;
+  --working-soft-teal: rgba(14, 159, 138, 0.1);
+
+  padding: 72px 20px 88px;
+  background:
+    radial-gradient(circle at top left, rgba(14, 159, 138, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.75) 20%),
+    var(--working-surface);
+  color: var(--working-navy);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.working-shell {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.working-header {
+  max-width: 760px;
+  margin: 0 auto 44px;
+  text-align: center;
+}
+
+.working-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--working-soft-teal);
+  color: var(--working-teal);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.working-header h2 {
+  margin: 14px 0 10px;
+  color: var(--working-navy);
+  font-family: 'Sora', sans-serif;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.working-header p {
+  margin: 0;
+  color: var(--working-muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.working-flow {
+  display: grid;
+  gap: 0;
+}
+
+.working-step-card {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 34px;
+  align-items: center;
+  padding: 28px;
+  border: 1px solid var(--working-border);
+  border-radius: 24px;
+  background: var(--working-card);
+  box-shadow: 0 18px 40px rgba(15, 31, 61, 0.08);
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease,
+    opacity 0.45s ease;
+}
+
+.working-step-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.working-step-card:hover {
+  border-color: rgba(14, 159, 138, 0.28);
+  box-shadow: 0 24px 46px rgba(15, 31, 61, 0.11);
+  transform: translateY(-4px);
+}
+
+.working-step-card--reverse {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+}
+
+.working-step-card--reverse .working-step-visual {
+  order: 2;
+}
+
+.working-step-card--reverse .working-step-content {
+  order: 1;
+}
+
+.working-step-visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 320px;
+  padding: 32px;
+  overflow: hidden;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(14, 159, 138, 0.18), transparent 28%),
+    linear-gradient(140deg, #eef8f6 0%, #f6f9ff 100%);
+}
+
+.working-step-orb {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(15, 31, 61, 0.08);
+  filter: blur(8px);
+  transform: translate(34%, -36%);
+}
+
+.working-step-card:nth-child(1) .working-step-visual,
+.working-step-card:nth-child(5) .working-step-visual {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(14, 159, 138, 0.18), transparent 28%),
+    linear-gradient(140deg, #eef8f6 0%, #f6f9ff 100%);
+}
+
+.working-step-card:nth-child(3) .working-step-visual {
+  background:
+    radial-gradient(circle at 72% 20%, rgba(15, 31, 61, 0.16), transparent 30%),
+    linear-gradient(140deg, #eef2fb 0%, #f9fbff 100%);
+}
+
+.working-step-image-frame {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 260px);
+  aspect-ratio: 1;
+  padding: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 20px 40px rgba(15, 31, 61, 0.12);
+}
+
+.working-step-image-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.working-step-float {
+  position: absolute;
+  left: 22px;
+  bottom: 22px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid rgba(15, 31, 61, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 22px rgba(15, 31, 61, 0.08);
+  color: var(--working-navy);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.working-step-float i {
+  color: var(--working-teal);
+}
+
+.working-step-content {
+  min-width: 0;
+}
+
+.working-step-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.working-step-number {
+  color: var(--working-teal);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.working-step-stage {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(15, 31, 61, 0.06);
+  color: var(--working-navy);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.working-step-content h3 {
+  margin: 0 0 12px;
+  color: var(--working-navy);
+  font-family: 'Sora', sans-serif;
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.working-step-content p {
+  margin: 0 0 20px;
+  color: var(--working-muted);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.working-step-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.working-step-stat {
+  padding: 14px 16px;
+  border: 1px solid rgba(14, 159, 138, 0.1);
+  border-radius: 16px;
+  background: rgba(14, 159, 138, 0.06);
+}
+
+.working-step-stat strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--working-navy);
+  font-family: 'Sora', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.working-step-stat span {
+  color: var(--working-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.working-step-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--working-teal), #22b9a3);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 12px 26px rgba(14, 159, 138, 0.24);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.working-step-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 34px rgba(14, 159, 138, 0.28);
+}
+
+.working-connector {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 14px 0 18px;
+}
+
+.working-connector-line {
+  width: 2px;
+  height: 44px;
+  background: linear-gradient(180deg, rgba(14, 159, 138, 0), rgba(14, 159, 138, 0.75));
+}
+
+.working-connector-badge {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid rgba(15, 31, 61, 0.08);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 22px rgba(15, 31, 61, 0.08);
+  color: var(--working-teal);
+  animation: workingBounce 2s infinite;
+}
+
+@keyframes workingBounce {
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
-    transform: translateY(-20px);
+    transform: translateY(-8px);
   }
 }
 
-@keyframes fadeInWorking {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.bounce-arrow {
-  animation: bounce 2s infinite;
-}
-
-.fade-in-working {
-  animation: fadeInWorking 2s ease-out;
-}
-
-.card-zoom {
-  transition: transform 0.3s ease;
-}
-
-.card-zoom:hover {
-  transform: scale(1.02);
-}
-
-/* Responsive styling */
-@media (max-width: 768px) {
-  .bounce-arrow {
-    font-size: 1.5rem !important;
-    margin: 1rem 0;
+@media (max-width: 980px) {
+  .working-step-card,
+  .working-step-card--reverse {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 
-  .m-3 {
-    margin: 1rem !important;
+  .working-step-card--reverse .working-step-visual,
+  .working-step-card--reverse .working-step-content {
+    order: initial;
+  }
+
+  .working-step-visual {
+    min-height: 280px;
   }
 }
 
-@media (max-width: 576px) {
-  .bounce-arrow {
-    font-size: 1.25rem !important;
-    margin: 0.75rem 0;
+@media (max-width: 640px) {
+  .working-page {
+    padding: 56px 14px 72px;
+  }
+
+  .working-header {
+    margin-bottom: 34px;
+  }
+
+  .working-header h2 {
+    font-size: 28px;
+  }
+
+  .working-header p {
+    font-size: 15px;
+  }
+
+  .working-step-card {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .working-step-visual {
+    min-height: 240px;
+    padding: 24px;
+  }
+
+  .working-step-float {
+    left: 16px;
+    bottom: 16px;
+  }
+
+  .working-step-content h3 {
+    font-size: 24px;
+  }
+
+  .working-step-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .working-connector-line {
+    height: 34px;
   }
 }

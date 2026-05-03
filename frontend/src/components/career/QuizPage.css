@@ -197,6 +197,57 @@
   font-weight: 500;
 }
 
+/* ── Multiple choice options ─────────────────── */
+.quiz-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.quiz-option {
+  display: flex;
+  align-items: stretch;
+  cursor: pointer;
+}
+
+.quiz-option__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.quiz-option__label {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.quiz-option:hover .quiz-option__label {
+  border-color: var(--teal);
+  background: var(--teal-dim);
+  color: var(--teal);
+  transform: translateY(-1px);
+}
+
+.quiz-option.is-selected .quiz-option__label,
+.quiz-option__input:checked + .quiz-option__label {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(14, 159, 138, 0.25);
+}
+
 /* ── Rating scale ─────────────────────────────── */
 .quiz-scale {
   display: flex;

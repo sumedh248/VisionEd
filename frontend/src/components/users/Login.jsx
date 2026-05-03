@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, { useCallback, useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { supabase, upsertCurrentUser } from "../../supabaseClient";
 
 const styles = {
   page: {
@@ -102,6 +102,23 @@ const styles = {
     cursor: "pointer",
     transition: "background 0.2s, transform 0.15s, box-shadow 0.2s",
   },
+  googleBtn: {
+    width: "100%",
+    padding: "12px",
+    background: "#ffffff",
+    color: "#1a3328",
+    border: "1.5px solid rgba(26, 80, 55, 0.14)",
+    borderRadius: "10px",
+    fontFamily: "'Sora', sans-serif",
+    fontSize: "14px",
+    fontWeight: "600",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "10px",
+    transition: "border-color 0.2s, transform 0.15s, box-shadow 0.2s",
+  },
   divider: {
     display: "flex",
     alignItems: "center",
@@ -144,10 +161,46 @@ const styles = {
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [focused, setFocused] = useState("");
+  const redirectTo =
+    typeof location.state?.from === "string" && location.state.from.trim()
+      ? location.state.from
+      : "/";
+
+  const goToNextStep = useCallback((profile) => {
+    if (profile?.role) {
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+
+    navigate("/signup", { replace: true });
+  }, [navigate]);
+
+  useEffect(() => {
+    const syncLoggedInUser = async () => {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) return;
+
+      try {
+        const profile = await upsertCurrentUser(user);
+        localStorage.setItem("user", JSON.stringify(profile || user));
+        goToNextStep(profile);
+      } catch (err) {
+        setError(err.message || "Signed in, but could not save your profile.");
+      }
+    };
+
+    syncLoggedInUser();
+  }, [goToNextStep]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -160,13 +213,37 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:5000/login", formData);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      navigate("/");
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (signInError) throw signInError;
+
+      const profile = await upsertCurrentUser(data.user);
+      localStorage.setItem("user", JSON.stringify(profile || data.user));
+      goToNextStep(profile);
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+      setError(err.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    setGoogleLoading(true);
+    setError("");
+
+    const { error: googleError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/login`,
+      },
+    });
+
+    if (googleError) {
+      setError(googleError.message || "Google login failed. Please try again.");
+      setGoogleLoading(false);
     }
   };
 
@@ -276,6 +353,31 @@ export default function Login() {
             <span style={styles.dividerText}>or</span>
             <div style={styles.dividerLine} />
           </div>
+
+          <button
+            type="button"
+            disabled={googleLoading}
+            onClick={loginWithGoogle}
+            style={{
+              ...styles.googleBtn,
+              ...(googleLoading ? { opacity: 0.7, cursor: "not-allowed" } : {}),
+            }}
+            onMouseEnter={(e) => {
+              if (!googleLoading) {
+                e.target.style.borderColor = "rgba(26, 158, 106, 0.34)";
+                e.target.style.boxShadow = "0 6px 18px rgba(26, 80, 55, 0.1)";
+                e.target.style.transform = "translateY(-1px)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.borderColor = "rgba(26, 80, 55, 0.14)";
+              e.target.style.boxShadow = "none";
+              e.target.style.transform = "translateY(0)";
+            }}
+          >
+            <i className="fab fa-google" />
+            {googleLoading ? "Opening Google..." : "Continue with Google"}
+          </button>
 
           <p style={styles.footer}>
             Don't have an account?{" "}

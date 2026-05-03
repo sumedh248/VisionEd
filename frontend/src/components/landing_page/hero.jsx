@@ -1,9 +1,33 @@
-import React from "react";
-import Homeimg from "../../assets/home.jpeg";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Homeimg from "../../assets/home.jpg";
+import { fetchSessionUser } from "../../utils/session";
 import "./hero.css";
-import { Link, useNavigate } from "react-router-dom";
+
 export default function Hero() {
   const navigate = useNavigate();
+  const [isCheckingAccess, setIsCheckingAccess] = useState(false);
+
+  const handleGetStarted = async () => {
+    try {
+      setIsCheckingAccess(true);
+      const sessionUser = await fetchSessionUser();
+
+      if (sessionUser) {
+        navigate("/quiz");
+        return;
+      }
+    } finally {
+      setIsCheckingAccess(false);
+    }
+
+    navigate("/login", {
+      state: {
+        from: "/quiz",
+      },
+    });
+  };
+
   return (
     <div>
       <div
@@ -23,13 +47,16 @@ export default function Hero() {
             Personalized Career Guidance for Every Student, Powered by AI.
             <br /> Let's Start with test and know where you get fitt!!
           </p>
-          <Link
-            to="/quiz"
+          <button
+            type="button"
             className="btn text-white card-hover"
             style={{ backgroundColor: "green" }}
+            onClick={handleGetStarted}
+            disabled={isCheckingAccess}
           >
-            Get Started Now →
-          </Link>
+            {isCheckingAccess ? "Checking session..." : "Get Started Now "}
+            {!isCheckingAccess && <span aria-hidden="true">&rarr;</span>}
+          </button>
         </div>
       </div>
 
