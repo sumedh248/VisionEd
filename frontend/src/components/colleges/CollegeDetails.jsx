@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchCollegeDetails, getCollegeImage } from "./collegeData";
 import { supabase } from "../../supabaseClient";
+import { API_BASE_URL } from "../../utils/api";
 import "./Colleges.css";
 
 function getAlumniName(alumni) {
@@ -32,7 +33,7 @@ function CollegeDetails() {
         return;
       }
       
-      const response = await fetch("http://localhost:5000/connections", {
+      const response = await fetch(`${API_BASE_URL}/connections`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

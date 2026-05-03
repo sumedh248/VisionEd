@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Signupimg from "../../assets/signup.jpeg";
 import { completeUserOnboarding, supabase } from "../../supabaseClient";
+import { API_BASE_URL } from "../../utils/api";
 import { fetchColleges } from "../colleges/collegeData";
 
 const styles = {
@@ -544,7 +545,7 @@ export default function Signup() {
         setSuccess("Profile saved. Redirecting...");
         setTimeout(() => navigate("/dashboard"), 900);
       } else {
-        const res = await axios.post("http://localhost:5000/signup", buildProfilePayload());
+        const res = await axios.post(`${API_BASE_URL}/signup`, buildProfilePayload());
         setSuccess(res.data.message || "Account created. Please sign in.");
         setTimeout(() => navigate("/login"), 1200);
       }

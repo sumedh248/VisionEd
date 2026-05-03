@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from "../../supabaseClient";
+import { API_BASE_URL } from "../../utils/api";
 import './AlumniDashboard.css';
 
 const AlumniDashboard = () => {
@@ -18,7 +19,7 @@ const AlumniDashboard = () => {
         throw new Error("Please log in");
       }
 
-      const response = await fetch("http://localhost:5000/alumni/dashboard", {
+      const response = await fetch(`${API_BASE_URL}/alumni/dashboard`, {
         headers: {
           Authorization: `Bearer ${session.access_token}`
         }
@@ -38,7 +39,7 @@ const AlumniDashboard = () => {
   const handleConnectionAction = async (id, status) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const response = await fetch(`http://localhost:5000/connections/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/connections/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

@@ -6,15 +6,28 @@ import pickle
 
 app = Flask(__name__)
 
-ALLOWED_ORIGINS = {"http://localhost:5173", "http://127.0.0.1:5173"}
+
+def get_allowed_origins():
+    configured = {
+        origin.strip()
+        for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
+        if origin.strip()
+    }
+    defaults = {
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://visionedd-frontend.onrender.com",
+    }
+    return configured | defaults
 
 
 @app.after_request
 def add_cors_headers(response):
     origin = request.headers.get("Origin")
 
-    if origin in ALLOWED_ORIGINS:
+    if origin in get_allowed_origins():
         response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Vary"] = "Origin"
 
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"

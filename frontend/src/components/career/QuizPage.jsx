@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../supabaseClient";
+import { API_BASE_URL } from "../../utils/api";
 import "./QuizPage.css";
 
 const SECTIONS = [
@@ -367,7 +368,7 @@ const QuizPage = () => {
         throw new Error("Please login first");
       }
 
-      const res = await fetch("http://localhost:5000/submit-test", {
+      const res = await fetch(`${API_BASE_URL}/submit-test`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

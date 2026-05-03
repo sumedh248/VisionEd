@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../../supabaseClient';
+import { API_BASE_URL } from "../../utils/api";
 import './ChatPage.css';
 
 const ChatPage = () => {
@@ -46,7 +47,7 @@ const ChatPage = () => {
   const fetchContacts = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const res = await fetch("http://localhost:5000/chat/contacts", {
+      const res = await fetch(`${API_BASE_URL}/chat/contacts`, {
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
       const data = await res.json();
@@ -76,7 +77,7 @@ const ChatPage = () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       // 1. Get or create conversation
-      const convRes = await fetch("http://localhost:5000/chat/conversations", {
+      const convRes = await fetch(`${API_BASE_URL}/chat/conversations`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -92,7 +93,7 @@ const ChatPage = () => {
       setConversationId(convId);
 
       // 2. Load messages
-      const msgRes = await fetch(`http://localhost:5000/chat/conversations/${convId}/messages`, {
+      const msgRes = await fetch(`${API_BASE_URL}/chat/conversations/${convId}/messages`, {
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
       const msgData = await msgRes.json();
@@ -151,7 +152,7 @@ const ChatPage = () => {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const res = await fetch(`http://localhost:5000/chat/conversations/${conversationId}/messages`, {
+      const res = await fetch(`${API_BASE_URL}/chat/conversations/${conversationId}/messages`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
