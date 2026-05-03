@@ -14,7 +14,7 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: FRONTEND_ORIGIN
-        value: https://visionedd-frontend.onrender.com
+        value: https://visioned-frontend.onrender.com
       - key: OPENROUTER_API_KEY
         sync: false
       - key: OPENROUTER_MODEL
@@ -31,7 +31,7 @@ services:
     startCommand: python app.py
     envVars:
       - key: ALLOWED_ORIGINS
-        value: https://visionedd-frontend.onrender.com,http://localhost:5173,http://127.0.0.1:5173
+        value: https://visioned-frontend.onrender.com,https://visionedd-frontend.onrender.com,http://localhost:5173,http://127.0.0.1:5173
 
   - type: web
     name: visionedd-frontend
@@ -44,7 +44,7 @@ services:
       - key: VITE_API_BASE_URL
         value: https://visioned-backend.onrender.com
       - key: VITE_APP_ORIGIN
-        value: https://visionedd-frontend.onrender.com
+        value: https://visioned-frontend.onrender.com
     routes:
       - type: rewrite
         source: /*

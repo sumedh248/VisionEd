@@ -13,9 +13,14 @@ dotenv.config({ path: join(__dirname, ".env") });
 const app = express();
 const PORT = process.env.PORT || 5000;
 const isProduction = process.env.NODE_ENV === "production";
+const LOCAL_FRONTEND_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"];
+const DEPLOYED_FRONTEND_ORIGINS = [
+  "https://visioned-frontend.onrender.com",
+  "https://visionedd-frontend.onrender.com",
+];
 const FRONTEND_ORIGIN =
   process.env.FRONTEND_ORIGIN ||
-  (isProduction ? "https://visionedd-frontend.onrender.com" : "http://localhost:5173");
+  (isProduction ? DEPLOYED_FRONTEND_ORIGINS[0] : LOCAL_FRONTEND_ORIGINS[0]);
 const ML_MODEL_URL =
   process.env.ML_MODEL_URL ||
   (isProduction ? "https://visioned-ml-model.onrender.com/predict" : "http://127.0.0.1:5001/predict");
@@ -27,7 +32,9 @@ const SCORE_SECTION_ALIASES = {
   social: ["social", "os_networks", "cyber_security"],
   tech: ["tech", "oop", "computer_architecture", "machine_learning", "cloud_computing"],
 };
-const allowedOrigins = [FRONTEND_ORIGIN, "http://localhost:5173", "http://127.0.0.1:5173"];
+const allowedOrigins = Array.from(
+  new Set([FRONTEND_ORIGIN, ...LOCAL_FRONTEND_ORIGINS, ...DEPLOYED_FRONTEND_ORIGINS])
+);
 
 const corsOptions = {
   origin(origin, callback) {
