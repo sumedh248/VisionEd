@@ -162,6 +162,7 @@ function Student() {
   const safeRoadmapSteps = Array.isArray(result?.roadmapSteps) ? result.roadmapSteps : [];
   const safeMlPredictions = Array.isArray(result?.mlPredictions) ? result.mlPredictions : [];
   const safeSources = result?.sources && typeof result.sources === "object" ? result.sources : {};
+  const hasMlCareer = Boolean(result?.career);
 
   const scoreEntries = useMemo(
     () =>
@@ -182,11 +183,7 @@ function Student() {
         scoreEntries.reduce((total, [, value]) => total + toPercent(value), 0) / scoreEntries.length
       )
     : 0;
-  const predictionList = safeMlPredictions.length
-    ? safeMlPredictions
-    : result?.career
-      ? [{ career: result.career, match: topScorePercent }]
-      : [];
+  const predictionList = safeMlPredictions.length ? safeMlPredictions : [];
   const roadmapStepsForFlow = safeRoadmapSteps.length
     ? safeRoadmapSteps
     : safeRoadmap.map((step) => {
@@ -200,7 +197,7 @@ function Student() {
       });
   const viewerName = storedUser?.name || result?.username || "";
   const topAreaLabel = formatMetricLabel(topScoreEntry?.[0] || result?.category || "career fit");
-  const careerMatchCount = predictionList.length || (result?.career ? 1 : 0);
+  const careerMatchCount = predictionList.length || (hasMlCareer ? 1 : 0);
 
   if (isLoading) {
     return (
@@ -237,7 +234,7 @@ function Student() {
           Here is your latest saved career guidance overview from the database.
         </p>
         <div className="dash-status">
-          <span className="dash-status__pill">{result.career || "Career recommendation"}</span>
+          <span className="dash-status__pill">{result.career || "No ML career prediction yet"}</span>
           <span className="dash-status__text">
             {saveStatus || `Showing your latest saved result from ${formatSavedDate(result.createdAt)}.`}
           </span>

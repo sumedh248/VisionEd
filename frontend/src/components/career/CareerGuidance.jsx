@@ -91,6 +91,10 @@ const CareerGuidance = () => {
   const safeRoadmapSteps = Array.isArray(result?.roadmapSteps) ? result.roadmapSteps : [];
   const safeMlPredictions = Array.isArray(result?.mlPredictions) ? result.mlPredictions : [];
   const safeSources = result?.sources && typeof result.sources === "object" ? result.sources : {};
+  const hasMlCareer = Boolean(result?.career);
+  const careerTitle = result?.career || "No ML career prediction available";
+  const categoryLabel =
+    result?.category || (safeSources.mlModel === "ml-unavailable" ? "ML prediction unavailable" : "");
   const roadmapStepsForFlow = safeRoadmapSteps.length
     ? safeRoadmapSteps
     : safeRoadmap.map((step) => {
@@ -116,6 +120,7 @@ const CareerGuidance = () => {
       <div className="cg-page">
         <h2>No result found. Please take the test.</h2>
         {saveStatus && <p>{saveStatus}</p>}
+        {!hasMlCareer && <p>The current result is limited to careers supported by the ML model.</p>}
       </div>
     ); 
   }
@@ -138,8 +143,8 @@ const CareerGuidance = () => {
 
       {/* Career Card */}
       <div className="cg-card highlight">
-        <h2>{result.career}</h2>
-        <p className="cg-category">{result.category}</p>
+        <h2>{careerTitle}</h2>
+        <p className="cg-category">{categoryLabel}</p>
       </div>
 
       {/* Scores */}

@@ -25,6 +25,30 @@ const ML_MODEL_URL =
   process.env.ML_MODEL_URL ||
   (isProduction ? "https://visioned-ml-model.onrender.com/predict" : "http://127.0.0.1:5001/predict");
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
+const ML_SUPPORTED_CAREERS = new Set([
+  "AI/ML Engineer",
+  "Cloud Engineer",
+  "Compiler Engineer",
+  "Cyber Security Analyst",
+  "Data Scientist",
+  "Database Administrator",
+  "Full Stack Developer",
+  "Game Developer",
+  "Software Engineer",
+  "System Engineer",
+]);
+const ML_CAREER_CATEGORIES = {
+  "AI/ML Engineer": "tech",
+  "Cloud Engineer": "tech",
+  "Compiler Engineer": "analytical",
+  "Cyber Security Analyst": "tech",
+  "Data Scientist": "analytical",
+  "Database Administrator": "analytical",
+  "Full Stack Developer": "tech",
+  "Game Developer": "creativity",
+  "Software Engineer": "tech",
+  "System Engineer": "tech",
+};
 const SCORE_KEYS = ["analytical", "creativity", "social", "tech"];
 const SCORE_SECTION_ALIASES = {
   analytical: ["analytical", "programming", "algorithms", "dbms", "compiler_design"],
@@ -167,6 +191,8 @@ const normalizeSkillList = (skills) => {
     .filter(Boolean);
 };
 
+const isSupportedMlCareer = (career) => ML_SUPPORTED_CAREERS.has(String(career || "").trim());
+
 const toRoadmapStrings = (steps) => {
   return steps.map((step) => {
     if (step.description) {
@@ -203,7 +229,7 @@ const parseCareerInsightsResponse = (rawContent) => {
 };
 
 const fetchCareerInsights = async (career, strengths) => {
-  if (!process.env.OPENROUTER_API_KEY) {
+  if (!career || !process.env.OPENROUTER_API_KEY) {
     return {
       skills: [],
       steps: [],
@@ -288,7 +314,7 @@ const fetchMlPredictions = async (scores) => {
         career_id: item?.career_id || null,
         match: Number(item?.match),
       }))
-      .filter((item) => item.career);
+      .filter((item) => item.career && isSupportedMlCareer(item.career));
   } catch (error) {
     console.error("ML model error:", error.response?.data || error.message);
     return [];
@@ -298,32 +324,32 @@ const fetchMlPredictions = async (scores) => {
 const buildCareerResult = async (scores) => {
   const mlPredictions = await fetchMlPredictions(scores);
   const mlTopCareer = mlPredictions[0]?.career || "";
-  const categoryFromMl = mlTopCareer ? careerToCategory[mlTopCareer.toLowerCase()] : "";
-  const category = categoryFromMl || getTopCategory(scores);
+  const categoryFromMl = mlTopCareer ? ML_CAREER_CATEGORIES[mlTopCareer] || "" : "";
+  const category = mlTopCareer ? categoryFromMl || getTopCategory(scores) : "";
   const profile = careerProfiles[category] || {
-    career: mlTopCareer || "Career Explorer",
+    career: mlTopCareer || "",
     skills: [],
     colleges: [],
     roadmap: [],
   };
 
-  const career = mlTopCareer || profile.career;
+  const career = mlTopCareer || "";
   const roadmapFromProfile = fallbackRoadmapSteps(category);
   const careerInsights = await fetchCareerInsights(career, scores);
-  const roadmapSteps = careerInsights.steps.length ? careerInsights.steps : roadmapFromProfile;
-  const skills = careerInsights.skills.length ? careerInsights.skills : profile.skills;
+  const roadmapSteps = career ? (careerInsights.steps.length ? careerInsights.steps : roadmapFromProfile) : [];
+  const skills = career ? (careerInsights.skills.length ? careerInsights.skills : profile.skills) : [];
 
   return {
     category,
     career,
     skills,
-    colleges: profile.colleges,
+    colleges: career ? profile.colleges : [],
     roadmap: toRoadmapStrings(roadmapSteps),
     roadmapSteps,
     scores,
     mlPredictions,
     sources: {
-      mlModel: mlPredictions.length ? ML_MODEL_URL : "rule-based-fallback",
+      mlModel: mlPredictions.length ? ML_MODEL_URL : "ml-unavailable",
       roadmapModel: careerInsights.source,
       skillsModel: careerInsights.source,
     },
@@ -790,14 +816,15 @@ app.get("/test-results/me", requireAuth, async (req, res) => {
           career: careerMap[p.career_id] || "Unknown Career",
           match: p.confidence_score
         }))
+        .filter((prediction) => isSupportedMlCareer(prediction.career))
         .sort((a, b) => b.match - a.match);
 
       // Prefer AI-generated data stored at submit time; fall back to profile
-      const storedCareer   = stored._career || "";
+      const storedCareer = isSupportedMlCareer(stored._career) ? stored._career : "";
       const storedCategory = stored._category || "";
       const topCareer = mlPredictions[0]?.career || storedCareer || "";
-      const categoryFromMl = topCareer ? careerToCategory[topCareer.toLowerCase()] : "";
-      const category = categoryFromMl || storedCategory || getTopCategory(scores);
+      const categoryFromMl = topCareer ? ML_CAREER_CATEGORIES[topCareer] || "" : "";
+      const category = topCareer ? categoryFromMl || storedCategory || getTopCategory(scores) : "";
       const profile  = careerProfiles[category] || { skills: [], colleges: [], roadmap: [] };
 
       const storedRoadmapSteps = Array.isArray(stored._roadmapSteps) ? stored._roadmapSteps : [];
@@ -810,7 +837,7 @@ app.get("/test-results/me", requireAuth, async (req, res) => {
         id: assessment.id,
         scores: scores,
         category: category,
-        career: topCareer || profile.career,
+        career: topCareer,
         skills:       storedSkills.length    ? storedSkills    : profile.skills,
         colleges:     storedColleges.length  ? storedColleges  : profile.colleges,
         roadmap:      storedRoadmap.length   ? storedRoadmap   : toRoadmapStrings(fallbackRoadmapSteps(category)),
@@ -867,11 +894,12 @@ app.get("/test-results/:username", requireAuth, async (req, res) => {
           career: careerMap[p.career_id] || "Unknown Career",
           match: p.confidence_score
         }))
+        .filter((prediction) => isSupportedMlCareer(prediction.career))
         .sort((a, b) => b.match - a.match);
 
       const topCareer = mlPredictions[0]?.career || "";
-      const categoryFromMl = topCareer && careerToCategory ? careerToCategory[topCareer.toLowerCase()] : "";
-      const category = categoryFromMl || getTopCategory(scores);
+      const categoryFromMl = topCareer ? ML_CAREER_CATEGORIES[topCareer] || "" : "";
+      const category = topCareer ? categoryFromMl || getTopCategory(scores) : "";
       const profile = careerProfiles[category] || { skills: [], colleges: [], roadmap: [] };
 
       return {
@@ -879,7 +907,7 @@ app.get("/test-results/:username", requireAuth, async (req, res) => {
         id: assessment.id,
         scores: scores,
         category: category,
-        career: topCareer || profile.career,
+        career: topCareer,
         skills: profile.skills,
         colleges: profile.colleges,
         roadmap: toRoadmapStrings(fallbackRoadmapSteps(category)),
