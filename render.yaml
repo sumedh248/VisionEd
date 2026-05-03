@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: visionedd-backend
+    name: visioned-backend
     runtime: node
     plan: free
     rootDir: backend
@@ -20,7 +20,18 @@ services:
       - key: OPENROUTER_MODEL
         value: openai/gpt-4o-mini
       - key: ML_MODEL_URL
-        value: https://visionedd-ml.onrender.com/predict
+        value: https://visioned-ml-model.onrender.com/predict
+
+  - type: web
+    name: visioned-ml-model
+    runtime: python
+    plan: free
+    rootDir: ml-model
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: ALLOWED_ORIGINS
+        value: https://visionedd-frontend.onrender.com,http://localhost:5173,http://127.0.0.1:5173
 
   - type: web
     name: visionedd-frontend
@@ -31,7 +42,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://visioned.onrender.com
+        value: https://visioned-backend.onrender.com
     routes:
       - type: rewrite
         source: /*

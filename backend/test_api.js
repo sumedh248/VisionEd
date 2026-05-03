@@ -1,8 +1,11 @@
 const axios = require('axios');
 
+const API_BASE_URL =
+  process.env.API_BASE_URL || "https://visioned-backend.onrender.com";
+
 async function test() {
   try {
-    const res = await axios.post("http://localhost:5000/career-predict", {
+    const res = await axios.post(`${API_BASE_URL}/career-predict`, {
       programming: 5,
       algorithms: 4,
       os_networks: 3,

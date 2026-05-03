@@ -12,8 +12,13 @@ dotenv.config({ path: join(__dirname, ".env") });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
-const ML_MODEL_URL = process.env.ML_MODEL_URL || "http://127.0.0.1:5001/predict";
+const isProduction = process.env.NODE_ENV === "production";
+const FRONTEND_ORIGIN =
+  process.env.FRONTEND_ORIGIN ||
+  (isProduction ? "https://visionedd-frontend.onrender.com" : "http://localhost:5173");
+const ML_MODEL_URL =
+  process.env.ML_MODEL_URL ||
+  (isProduction ? "https://visioned-ml-model.onrender.com/predict" : "http://127.0.0.1:5001/predict");
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
 const SCORE_KEYS = ["analytical", "creativity", "social", "tech"];
 const SCORE_SECTION_ALIASES = {
@@ -22,8 +27,6 @@ const SCORE_SECTION_ALIASES = {
   social: ["social", "os_networks", "cyber_security"],
   tech: ["tech", "oop", "computer_architecture", "machine_learning", "cloud_computing"],
 };
-const isProduction = process.env.NODE_ENV === "production";
-
 const allowedOrigins = [FRONTEND_ORIGIN, "http://localhost:5173", "http://127.0.0.1:5173"];
 
 const corsOptions = {
