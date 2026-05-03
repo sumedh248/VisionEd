@@ -43,6 +43,8 @@ services:
     envVars:
       - key: VITE_API_BASE_URL
         value: https://visioned-backend.onrender.com
+      - key: VITE_APP_ORIGIN
+        value: https://visionedd-frontend.onrender.com
     routes:
       - type: rewrite
         source: /*

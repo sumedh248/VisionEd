@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Signupimg from "../../assets/signup.jpeg";
 import { completeUserOnboarding, supabase } from "../../supabaseClient";
+import { getAppRedirectUrl } from "../../utils/appOrigin";
 import { API_BASE_URL } from "../../utils/api";
 import { fetchColleges } from "../colleges/collegeData";
 
@@ -563,7 +564,7 @@ export default function Signup() {
     const { error: googleError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/signup`,
+        redirectTo: getAppRedirectUrl("/signup"),
       },
     });
 

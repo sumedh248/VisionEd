@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase, upsertCurrentUser } from "../../supabaseClient";
+import { getAppRedirectUrl } from "../../utils/appOrigin";
 
 const styles = {
   page: {
@@ -237,7 +238,7 @@ export default function Login() {
     const { error: googleError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/login`,
+        redirectTo: getAppRedirectUrl("/login"),
       },
     });
 
