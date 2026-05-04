@@ -16,7 +16,6 @@ const isProduction = process.env.NODE_ENV === "production";
 const LOCAL_FRONTEND_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"];
 const DEPLOYED_FRONTEND_ORIGINS = [
   "https://visioned-frontend.onrender.com",
-  "https://visionedd-frontend.onrender.com",
 ];
 const FRONTEND_ORIGIN =
   process.env.FRONTEND_ORIGIN ||

@@ -4,8 +4,7 @@ const LOCAL_ORIGINS = new Set([
 ]);
 
 const DEPLOYED_APP_ORIGINS = new Set([
-  "https://visioned-frontend.onrender.com",
-  "https://visionedd-frontend.onrender.com",
+  "https://visioned-frontend.onrender.com"
 ]);
 
 const FALLBACK_APP_ORIGIN = "https://visioned-frontend.onrender.com";

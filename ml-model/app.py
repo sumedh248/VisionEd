@@ -34,8 +34,7 @@ def get_allowed_origins():
     defaults = {
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "https://visioned-frontend.onrender.com",
-        "https://visionedd-frontend.onrender.com",
+        "https://visioned-frontend.onrender.com"
     }
     return configured | defaults
 
